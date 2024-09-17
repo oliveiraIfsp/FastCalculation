@@ -72,37 +72,45 @@ class GameFragment : Fragment() {
         fun newInstance(settings:Settings) =
             GameFragment().apply {
                 arguments = Bundle().apply {
-                putParcelable(EXTRA_SETTINGS, settings)
+                    putParcelable(EXTRA_SETTINGS, settings)
                 }
             }
     }
     private fun play(){
         currentRound = calculationGame.nextRound()
         if(currentRound!=null){
-          fragmentGameBinding.apply {
-              "Round: ${currentRound!!.round} / ${settings.rounds}".also {
-                  roundTv.text = it
-          }
+            fragmentGameBinding.apply {
+                "Round: ${currentRound!!.round} / ${settings.rounds}".also {
+                    roundTv.text = it
+                }
                 questionTv.text = currentRound!!.question
                 alternativeOneBt.text = currentRound!!.alt1.toString()
                 alternativeTwoBt.text = currentRound!!.alt2.toString()
                 alternativeThreeBt.text = currentRound!!.alt3.toString()
-          }
-          startRoundTime = System.currentTimeMillis()
-          roundDeadLineHandler.sendEmptyMessageDelayed(MSG_ROUND_DEADLINE, settings.roundInterval)
-        }else{
-            with(fragmentGameBinding){
-                roundTv.text = getString(R.string.points)
-                val points = hits*10f / (totalGameTime/1000L)
-                "%.1f".format(points).also {
-                    questionTv.text = it
-                }
-                alternativeOneBt.visibility = View.GONE
-                alternativeTwoBt.visibility = View.GONE
-                alternativeThreeBt.visibility = View.GONE
             }
+            startRoundTime = System.currentTimeMillis()
+            roundDeadLineHandler.sendEmptyMessageDelayed(MSG_ROUND_DEADLINE, settings.roundInterval)
+        }else{
+            val points = hits * 10f / (totalGameTime / 1000L)
+            val intent = ResultActivity.newIntent(requireContext(), points, settings)
+            startActivity(intent)
+            requireActivity().finish()
+
+
+
+            /* with(fragmentGameBinding){
+              roundTv.text = getString(R.string.points)
+               val points = hits*10f / (totalGameTime/1000L)
+               "%.1f".format(points).also {
+                   questionTv.text = it
+               }
+               alternativeOneBt.visibility = View.GONE
+               alternativeTwoBt.visibility = View.GONE
+               alternativeThreeBt.visibility = View.GONE*/
 
         }
+
+
     }
 
 }
